@@ -5,9 +5,9 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, unset_jwt_cookies
 from datetime import timedelta
 from models import db, User, Space, Booking
-from config import DATABASE_CONFIG  # Import the config
+# from config import DATABASE_CONFIG  # Import the config
 import secrets
-from payment import trigger_stk_push, query_stk_push
+# from payment import trigger_stk_push, query_stk_push
 import os 
 from dotenv import load_dotenv
 
@@ -205,30 +205,30 @@ def get_bookings():
         booking_list.append(booking_data)
     return jsonify({"success": True, "bookings": booking_list}), 200
 
-@app.route('/make_payment', methods=['POST'])
-@jwt_required()
-def make_payment():
-    data = request.get_json()
-    # Extract payment details from request
-    phone_number = data['phone_number']
-    amount = data['amount']
-    callback_url = data['callback_url']
-    account_ref = data['account_ref']
-    description = data['description']
+# @app.route('/make_payment', methods=['POST'])
+# @jwt_required()
+# def make_payment():
+#     data = request.get_json()
+#     # Extract payment details from request
+#     phone_number = data['phone_number']
+#     amount = data['amount']
+#     callback_url = data['callback_url']
+#     account_ref = data['account_ref']
+#     description = data['description']
 
-    # Trigger STK push payment
-    payment_response = trigger_stk_push(phone_number, amount, callback_url, account_ref, description)
-    return jsonify(payment_response), 200
+#     # Trigger STK push payment
+#     payment_response = trigger_stk_push(phone_number, amount, callback_url, account_ref, description)
+#     return jsonify(payment_response), 200
 
-@app.route('/check_payment_status', methods=['POST'])
-@jwt_required()
-def check_payment_status():
-    data = request.get_json()
-    checkout_request_id = data['checkout_request_id']
+# @app.route('/check_payment_status', methods=['POST'])
+# @jwt_required()
+# def check_payment_status():
+#     data = request.get_json()
+#     checkout_request_id = data['checkout_request_id']
 
-    # Query STK push payment status
-    payment_status_response = query_stk_push(checkout_request_id)
-    return jsonify(payment_status_response), 200
+#     # Query STK push payment status
+#     payment_status_response = query_stk_push(checkout_request_id)
+#     return jsonify(payment_status_response), 200
 
 
 

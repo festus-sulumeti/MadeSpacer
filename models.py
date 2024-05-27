@@ -39,5 +39,4 @@ class Booking(db.Model):
     payment_status = db.Column(db.String(20), nullable=False, default='unpaid')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # user = db.relationship('User', backref='bookings')
-    # space = db.relationship('Space', backref='bookings')
+    
