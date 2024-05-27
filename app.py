@@ -11,7 +11,7 @@ import secrets
 import os 
 from dotenv import load_dotenv
 
-app = Flask(_name_)
+app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 load_dotenv()
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
@@ -232,5 +232,5 @@ def get_bookings():
 
 
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     app.run(debug=False)
