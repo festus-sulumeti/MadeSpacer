@@ -5,7 +5,7 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, unset_jwt_cookies
 from datetime import timedelta
 from models import db, User, Space, Booking
-# from config import DATABASE_CONFIG  # Import the config
+from config import DATABASE_CONFIG  # Import the config
 import secrets
 # from payment import trigger_stk_push, query_stk_push
 import os 
