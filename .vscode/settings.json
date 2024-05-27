@@ -1,0 +1,19 @@
+{
+    "sqltools.connections": [
+        {
+            "mssqlOptions": {
+                "appName": "SQLTools",
+                "useUTC": true,
+                "encrypt": true
+            },
+            "previewLimit": 50,
+            "server": "dpg-cp9u0nkf7o1s73a6s41g-a.oregon-postgres.render.com",
+            "port": 5432,
+            "driver": "MSSQL",
+            "name": "space sql",
+            "database": "spacer_xoj6",
+            "username": "spacer_xoj6_user",
+            "password": "qWrKxjhca4KlQCKmaedwp9hl009rSisV"
+        }
+    ]
+}
