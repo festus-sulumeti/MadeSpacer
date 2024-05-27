@@ -5,5 +5,5 @@ DATABASE_CONFIG = {
     'pw': '#Sulumeti28',
     'db': 'spacer',
     'host': 'localhost',
-    'port': '5432',
+    'port': 5432,
 }
