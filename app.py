@@ -1,24 +1,26 @@
 from flask import Flask, request, jsonify
-from datetime import datetime
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, unset_jwt_cookies
 from datetime import timedelta
 from models import db, User, Space, Booking
-from config import DATABASE_CONFIG  # Import the config
-import secrets
-# from payment import trigger_stk_push, query_stk_push
-import os 
+import os
 from dotenv import load_dotenv
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
 load_dotenv()
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
-# Generate a random secret key
-jwt_secret_key = secrets.token_hex(32)  # Generate a 32-byte (256-bit) random key
 
-# Set the JWT_SECRET_KEY in your Flask app's configuration
+# Check if the app is running in production mode
+if os.environ.get('ENV') == 'production':
+    # Only allow specific origins in production
+    CORS(app, resources={r"/*": {"origins": "https://spacer-ofu8yphju-festus-projects-4e9b2717.vercel.app/"}})
+else:
+    # Allow all origins in development
+    CORS(app)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
+
+# Generate a random secret key
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
 
 # Initialize extensions
@@ -35,33 +37,25 @@ def index():
 @app.route('/adminlogin', methods=['POST'])
 def admin_login():
     data = request.get_json()
-
-    # Check login credentials
     if data['email'] == 'admin@gmail.com' and data['password'] == 'password':
         expiration_time = timedelta(hours=1)
         token = create_access_token(identity=data['email'], expires_delta=expiration_time)
-
         return jsonify({"success": True, "message": "Login successful", "token": token, 'user_email': data['email'], 'role': 'admin'}), 200
     else:
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
-
 # Route for admin logout
 @app.route('/adminlogout', methods=['POST'])
-#@jwt_required()  # Protect this route with JWT authentication
 def admin_logout():
     try:
-        # Unset JWT cookies to log the user out
         response = jsonify({"success": True, "message": "Logout successful"})
         unset_jwt_cookies(response)
         return response, 200
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
-
 # Add Space Route
 @app.route('/spaces', methods=['POST'])
-#@jwt_required()  # Protect this route with JWT authentication
 def add_space():
     data = request.get_json()
     new_space = Space(name=data['name'], description=data['description'], location=data['location'], price_per_hour=data['price_per_hour'], owner_id=data['owner_id'])
@@ -80,9 +74,9 @@ def get_spaces():
             'name': space.name,
             'description': space.description,
             'location': space.location,
-            'price_per_hour': str(space.price_per_hour),  # Convert to string for JSON compatibility
+            'price_per_hour': str(space.price_per_hour),
             'owner_id': space.owner_id,
-            'created_at': str(space.created_at)  # Convert to string for JSON compatibility
+            'created_at': str(space.created_at)
         }
         space_list.append(space_data)
     return jsonify({"success": True, "spaces": space_list}), 200
@@ -91,7 +85,6 @@ def get_spaces():
 @app.route('/users', methods=['POST'])
 def add_user():
     data = request.get_json()
-    # Hash the password before storing it in the database
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
     new_user = User(username=data['username'], email=data['email'], password=hashed_password)
     db.session.add(new_user)
@@ -101,16 +94,14 @@ def add_user():
 @app.route('/userlogin', methods=['POST'])
 def user_login():
     data = request.get_json()
-
-    # Check if the user exists
     user = User.query.filter_by(email=data['email']).first()
-
     if user and bcrypt.check_password_hash(user.password, data['password']):
         expiration_time = timedelta(hours=1)
         token = create_access_token(identity=user.email, expires_delta=expiration_time)
         return jsonify({"success": True, "message": "Login successful", "token": token, 'user_email': user.email, 'role': user.role}), 200
     else:
         return jsonify({"success": False, "message": "Invalid email or password"}), 401
+
     
 # URL Route for getting all users
 @app.route('/users', methods=['GET'])
