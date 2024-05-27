@@ -233,4 +233,4 @@ def check_payment_status():
 
 
 if _name_ == '_main_':
-    app.run(debug=True)
+    app.run(debug=False)
