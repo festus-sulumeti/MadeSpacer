@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, unset_jwt_cookies
 from datetime import timedelta
-from models import db, User, Space, Booking
+from models import db
 import os
 from dotenv import load_dotenv
 
@@ -11,12 +11,12 @@ app = Flask(__name__)
 load_dotenv()
 
 # Check if the app is running in production mode
-if os.environ.get('ENV') == 'production':
-    # Only allow specific origins in production
-    CORS(app, resources={r"/*": {"origins": "https://spacer-ofu8yphju-festus-projects-4e9b2717.vercel.app/"}})
-else:
-    # Allow all origins in development
-    CORS(app)
+# if os.environ.get('ENV') == 'production':
+#     # Only allow specific origins in production
+#     CORS(app, resources={r"/*": {"origins": "https://spacer-ofu8yphju-festus-projects-4e9b2717.vercel.app/"}})
+# else:
+#     # Allow all origins in development
+#     CORS(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 
@@ -24,6 +24,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
 
 # Initialize extensions
+CORS(app)
 db.init_app(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
@@ -55,7 +56,7 @@ def admin_logout():
         return jsonify({"success": False, "message": str(e)}), 500
 
 # Add Space Route
-@app.route('/spaces', methods=['POST'])
+@app.route('/addspaces', methods=['POST'])
 def add_space():
     data = request.get_json()
     new_space = Space(name=data['name'], description=data['description'], location=data['location'], price_per_hour=data['price_per_hour'], owner_id=data['owner_id'])
@@ -64,7 +65,7 @@ def add_space():
     return jsonify({"success": True, "message": "Space added successfully"}), 201
 
 # View All Spaces Route
-@app.route('/spaces', methods=['GET'])
+@app.route('/getspaces', methods=['GET'])
 def get_spaces():
     spaces = Space.query.all()
     space_list = []
@@ -82,7 +83,7 @@ def get_spaces():
     return jsonify({"success": True, "spaces": space_list}), 200
 
 # URL Route for adding a new user
-@app.route('/users', methods=['POST'])
+@app.route('/addusers', methods=['POST'])
 def add_user():
     data = request.get_json()
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
@@ -104,7 +105,7 @@ def user_login():
 
     
 # URL Route for getting all users
-@app.route('/users', methods=['GET'])
+@app.route('/getusers', methods=['GET'])
 def get_users():
     users = User.query.all()
     user_list = []
@@ -147,7 +148,7 @@ def user_logout():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
-@app.route('/bookings', methods=['POST'])
+@app.route('/addbookings', methods=['POST'])
 def add_booking():
     data = request.get_json()
     
@@ -178,7 +179,7 @@ def add_booking():
 
     return jsonify({"success": True, "message": "Booking added successfully"}), 201
 
-@app.route('/bookings', methods=['GET'])
+@app.route('/getbookings', methods=['GET'])
 def get_bookings():
     bookings = Booking.query.all()
     booking_list = []
